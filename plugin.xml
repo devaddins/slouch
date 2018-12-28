@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<plugin id="com.devaddins.slouch" version="0.0.0" xmlns="http://apache.org/cordova/ns/plugins/1.0" xmlns:android="http://schemas.android.com/apk/res/android">
+    <name>slouch</name>
+    <js-module name="slouch" src="www/slouch.js">
+        <clobbers target="cordova.plugins.slouch" />
+    </js-module>
+</plugin>
