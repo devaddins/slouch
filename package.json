@@ -1,0 +1,21 @@
+{
+  "name": "com.devaddins.slouch",
+  "version": "0.0.0",
+  "description": "lazy couchbase plugin",
+  "cordova": {
+    "id": "com.devaddins.slouch",
+    "platforms": [
+      "android"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git:slouch.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-android"
+  ],
+  "author": "ben@devaddins.com",
+  "license": "ISC"
+}
