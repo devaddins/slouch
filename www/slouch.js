@@ -23,3 +23,9 @@ exports.delete = function(path) {
         exec(res, rej, 'slouch', 'delete', [path]);
     });
 };
+
+exports.table = function(path, data) {
+    return new Promise(function(res, rej){
+        exec(res, rej, 'slouch', 'table', [path, data]);
+    });
+};
