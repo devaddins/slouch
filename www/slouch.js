@@ -29,3 +29,9 @@ exports.table = function(path, data) {
         exec(res, rej, 'slouch', 'table', [path, data]);
     });
 };
+
+exports.database = function(path) {
+    return new Promise(function(res, rej){
+        exec(res, rej, 'slouch', 'database', [path]);
+    });
+};

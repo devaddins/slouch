@@ -18,75 +18,54 @@ public class Slouch extends CordovaPlugin {
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext context) throws JSONException {
         if (action.equals("get")) {
-            // this.get(args.getString(0), context);
             Request req = new Request(args.getString(0), context);
             this.get(req);
             return true;
         } else if (action.equals("put")) {
-            this.put(args.getString(0), args.getString(1), context);
+            Request req = new Request(args.getString(0), args.getString(1), context);
+            this.put(req);
             return true;
         } else if (action.equals("post")) {
-            this.post(args.getString(0), args.getString(1), context);
+            Request req = new Request(args.getString(0), args.getString(1), context);
+            this.post(req);
             return true;
         } else if (action.equals("delete")) {
-            this.delete(args.getString(0), context);
+            Request req = new Request(args.getString(0), context);
+            this.delete(req);
             return true;
         } else if (action.equals("table")) {
-            this.table(args.getString(0), args.getString(1), context);
+            Request req = new Request(args.getString(0), args.getString(1), context);
+            this.table(req);
+            return true;
+        } else if (action.equals("database")) {
+            Request req = new Request(args.getString(0), context);
+            this.database(req);
             return true;
         }
         return false;
     }
 
-    private void get(String path, CallbackContext context) {
-        try {
-            context.success("foo");
-        } 
-        catch (Exception x) {
-            context.error(x.getMessage());
-        }
-    }
-
     private void get(Request request) {
-        // request.getContext().success(request.getPath());
         request.getContext().success(request.getTable());
-        // request.getContext().success(request.getDatabase());
-        // request.getContext().success(request.getId());
     }
 
-    private void put(String path, String data, CallbackContext context) {
-        try {
-            context.success("foo");
-        } 
-        catch (Exception x) {
-            context.error(x.getMessage());
-        }
+    private void put(Request request) {
+        request.getContext().success(request.getTable());
     }
 
-    private void post(String path, String data, CallbackContext context) {
-        try {
-            context.success("foo");
-        } 
-        catch (Exception x) {
-            context.error(x.getMessage());
-        }
+    private void post(Request request) {
+        request.getContext().success(request.getTable());
     }
 
-    private void delete(String path, CallbackContext context) {
-        try {
-            context.success("foo");
-        } 
-        catch (Exception x) {
-            context.error(x.getMessage());
-        }
+    private void delete(Request request) {
+        request.getContext().success(request.getTable());
     }
     
-    private void table(String path, String data, CallbackContext context) {
-        try {
-            context.success("foo");
-        } 
-        catch (Exception x) {
-            context.error(x.getMessage());
-        }
+    private void table(Request request) {
+        request.getContext().success(request.getTable());
+    }
+    
+    private void database(Request request) {
+        request.getContext().success(request.getTable());
     }
 }
