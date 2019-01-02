@@ -9,10 +9,11 @@
     <platform name="android">
         <config-file parent="/*" target="res/xml/config.xml">
             <feature name="slouch">
-                <param name="android-package" value="com.devaddins.slouch.slouch" />
+                <param name="android-package" value="com.devaddins.slouch.Slouch" />
             </feature>
         </config-file>
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
-        <source-file src="src/android/slouch.java" target-dir="src/com/devaddins/slouch/slouch" />
+        <source-file src="src/android/Slouch.java" target-dir="src/com/devaddins/slouch" />
+        <source-file src="src/android/Request.java" target-dir="src/com/devaddins/slouch" />
     </platform>
 </plugin>
