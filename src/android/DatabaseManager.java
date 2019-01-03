@@ -9,20 +9,32 @@ import com.couchbase.lite.FullTextIndex;
 import com.couchbase.lite.FullTextIndexItem;
 import com.couchbase.lite.IndexBuilder;
 
+import java.util.Map;
+import java.util.HashMap;
+
 public class DatabaseManager {
 
-    private static Database database;
     private static DatabaseManager instance = null;
 
-    private DatabaseManager(Context context, String name) throws CouchbaseLiteException {
-        DatabaseConfiguration configuration = new DatabaseConfiguration(context);
-        database = new Database(name, configuration);
+    private static Map<String, Database> Databases = new HashMap<String, Database>();
+
+    private static DatabaseConfiguration configuration = null;
+
+    private DatabaseManager(Context context) throws CouchbaseLiteException {
+        configuration = new DatabaseConfiguration(context);
+    }
+
+    private static void createDatabase(String name) throws CouchbaseLiteException {
+        Databases.put(name, new Database(name, configuration));
     }
 
     public static Database getDatabase(Context context, String name) throws CouchbaseLiteException {
         if (instance == null) {
-            instance = new DatabaseManager(context, name);
+            instance = new DatabaseManager(context);
         }
-        return database;
+        if (!Databases.containsKey(name)) {
+            createDatabase(name);
+        }
+        return Databases.get(name);
     }
 }

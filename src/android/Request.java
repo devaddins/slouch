@@ -14,7 +14,7 @@ public class Request {
         this.path = path;
         this.data = new JSONObject(data);
         this.setDatabase(path);
-        this.setTable(path);
+        this.setType(path);
         this.setId(path);
     }
     
@@ -26,7 +26,7 @@ public class Request {
     private JSONObject data;
     private CallbackContext context;
     private String database;
-    private String table;
+    private String type;
     private String id;
 
     public String getPath() {
@@ -37,8 +37,8 @@ public class Request {
         return this.database;
     }
     
-    public String getTable() {
-        return this.table;
+    public String getType() {
+        return this.type;
     }
     
     public String getId() {
@@ -63,14 +63,14 @@ public class Request {
         this.database = db;
     }
 
-    private void setTable(String path) {
-        String tb = null;
+    private void setType(String path) {
+        String ty = null;
         Pattern p = Pattern.compile("^slouch://(\\w+)/(\\w+)");
         Matcher m = p.matcher(path);
         if (m.find() && m.groupCount() >= 2) {
-            tb = m.group(2);
+            ty = m.group(2);
         }
-        this.table = tb;
+        this.type = ty;
     }
 
     private void setId(String path) {

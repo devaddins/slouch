@@ -1,9 +1,19 @@
 package com.devaddins.slouch;
 
+import android.content.Context;
+
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
 import com.couchbase.lite.Database;
+import com.couchbase.lite.DataSource;
+import com.couchbase.lite.Expression;
+import com.couchbase.lite.Query;
+import com.couchbase.lite.QueryBuilder;
+import com.couchbase.lite.ResultSet;
+import com.couchbase.lite.SelectResult;
+
+import com.google.gson.Gson;
 
 import org.json.JSONArray;
 import org.json.JSONException;
@@ -18,7 +28,7 @@ import com.devaddins.slouch.DatabaseManager;
  */
 public class Slouch extends CordovaPlugin {
 
-    Database database = null;
+    Gson gson = new Gson();
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext context) throws JSONException {
@@ -50,27 +60,43 @@ public class Slouch extends CordovaPlugin {
         return false;
     }
 
+    private Context getAppContext() {
+        return this.cordova.getActivity().getApplicationContext(); 
+    }
+
     private void get(Request request) {
-        request.getContext().success(request.getTable());
+        try {
+            Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+            String id = request.getId();
+                Query query = QueryBuilder
+                .select(SelectResult.all())
+                .from(DataSource.database(db))
+                .where(Expression.property("type").equalTo(Expression.string(request.getType())));
+                ResultSet rs = query.execute();
+                request.getContext().success(gson.toJson(rs.allResults()));
+        } 
+        catch (Exception x) {
+            request.getContext().error(x.getMessage());
+        }
     }
 
     private void put(Request request) {
-        request.getContext().success(request.getTable());
+        request.getContext().success(request.getType());
     }
 
     private void post(Request request) {
-        request.getContext().success(request.getTable());
+        request.getContext().success(request.getType());
     }
 
     private void delete(Request request) {
-        request.getContext().success(request.getTable());
+        request.getContext().success(request.getType());
     }
     
     private void table(Request request) {
-        request.getContext().success(request.getTable());
+        request.getContext().success(request.getType());
     }
     
     private void database(Request request) {
-        request.getContext().success(request.getTable());
+        request.getContext().success(request.getType());
     }
 }
