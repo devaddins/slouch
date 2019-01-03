@@ -3,17 +3,22 @@ package com.devaddins.slouch;
 import org.apache.cordova.CordovaPlugin;
 import org.apache.cordova.CallbackContext;
 
+import com.couchbase.lite.Database;
+
 import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
 import com.devaddins.slouch.Request;
+import com.devaddins.slouch.DatabaseManager;
 
 /**
  * simple lazy couchbase
  * slouch://database_name/table_name/{id} 
  */
 public class Slouch extends CordovaPlugin {
+
+    Database database = null;
 
     @Override
     public boolean execute(String action, JSONArray args, CallbackContext context) throws JSONException {

@@ -15,5 +15,6 @@
         <config-file parent="/*" target="AndroidManifest.xml"></config-file>
         <source-file src="src/android/Slouch.java" target-dir="src/com/devaddins/slouch" />
         <source-file src="src/android/Request.java" target-dir="src/com/devaddins/slouch" />
+        <source-file src="src/android/DatabaseManager.java" target-dir="src/com/devaddins/slouch" />
     </platform>
 </plugin>

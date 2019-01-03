@@ -18,12 +18,8 @@ public class Request {
         this.setId(path);
     }
     
-    public Request(String path, CallbackContext context) {
-        this.context = context;
-        this.path = path;
-        this.setDatabase(path);
-        this.setTable(path);
-        this.setId(path);
+    public Request(String path, CallbackContext context) throws JSONException {
+        this(path, "{}", context);
     }
 
     private String path;
@@ -36,8 +32,27 @@ public class Request {
     public String getPath() {
         return path;
     }
-
     
+    public String getDatabase() {
+        return this.database;
+    }
+    
+    public String getTable() {
+        return this.table;
+    }
+    
+    public String getId() {
+        return this.id;
+    }
+    
+    public CallbackContext getContext() {
+        return context;
+    }
+
+    public JSONObject getData() {
+        return data;
+    }
+
     private void setDatabase(String path) {
         String db = null;
         Pattern p = Pattern.compile("^slouch://(\\w+)/");
@@ -46,10 +61,6 @@ public class Request {
             db = m.group(1);
         }
         this.database = db;
-    }
-
-    public String getDatabase() {
-        return this.database;
     }
 
     private void setTable(String path) {
@@ -62,10 +73,6 @@ public class Request {
         this.table = tb;
     }
 
-    public String getTable() {
-        return this.table;
-    }
-
     private void setId(String path) {
         String id = null;
         Pattern p = Pattern.compile("^slouch://(\\w+)/(\\w+)/(\\d+)");
@@ -74,17 +81,5 @@ public class Request {
             id = m.group(3);
         }
         this.id = id;
-    }
-
-    public String getId() {
-        return this.id;
-    }
-
-    public CallbackContext getContext() {
-        return context;
-    }
-
-    public JSONObject getData() {
-        return data;
     }
 }
