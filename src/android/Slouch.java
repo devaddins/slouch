@@ -8,10 +8,13 @@ import org.apache.cordova.CallbackContext;
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DataSource;
 import com.couchbase.lite.Expression;
+import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Query;
 import com.couchbase.lite.QueryBuilder;
 import com.couchbase.lite.ResultSet;
+import com.couchbase.lite.Result;
 import com.couchbase.lite.SelectResult;
+import com.couchbase.lite.CouchbaseLiteException;
 
 import com.google.gson.Gson;
 
@@ -19,8 +22,14 @@ import org.json.JSONArray;
 import org.json.JSONException;
 import org.json.JSONObject;
 
+import java.util.ArrayList;
+import java.util.List;
+import java.util.HashMap;
+import java.util.Map;
+
 import com.devaddins.slouch.Request;
 import com.devaddins.slouch.DatabaseManager;
+
 
 /**
  * simple lazy couchbase
@@ -64,16 +73,39 @@ public class Slouch extends CordovaPlugin {
         return this.cordova.getActivity().getApplicationContext(); 
     }
 
+    private String toJson(ResultSet resultSet) {
+        ArrayList<Map<String, Object>> rslt = new ArrayList<Map<String, Object>>();
+        for (Result r: resultSet.allResults()) {
+            rslt.add(r.toMap());
+        }
+        return gson.toJson(rslt);
+    }
+
+    private void delete(ResultSet resultSet, Database database) throws CouchbaseLiteException {
+        ArrayList<Map<String, Object>> rslt = new ArrayList<Map<String, Object>>();
+        for (Result r: resultSet.allResults()) {
+            // database.delete(r); // TODO! does not work
+        }
+    }
+
     private void get(Request request) {
         try {
             Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
             String id = request.getId();
-                Query query = QueryBuilder
-                .select(SelectResult.all())
+            String type = request.getType();
+            Query query;
+            if (id == null || id.equals("")){ 
+                query = QueryBuilder.select(SelectResult.all())
                 .from(DataSource.database(db))
-                .where(Expression.property("type").equalTo(Expression.string(request.getType())));
-                ResultSet rs = query.execute();
-                request.getContext().success(gson.toJson(rs.allResults()));
+                .where(Expression.property("type").equalTo(Expression.string(type)));
+            } 
+            else {
+                query = QueryBuilder.select(SelectResult.all())
+                .from(DataSource.database(db))
+                .where(Expression.property("type").equalTo(Expression.string(type))
+                    .and(Expression.property("id").equalTo(Expression.string(id))));
+            }
+            request.getContext().success(toJson(query.execute()));
         } 
         catch (Exception x) {
             request.getContext().error(x.getMessage());
@@ -85,11 +117,41 @@ public class Slouch extends CordovaPlugin {
     }
 
     private void post(Request request) {
-        request.getContext().success(request.getType());
+        try {
+            Database db = DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+            MutableDocument doc = new MutableDocument(request.getDataMap());
+            doc.setString("type", request.getType());
+            db.save(doc);
+            request.getContext().success("true");
+        }
+        catch (Exception x) {
+            request.getContext().error(x.getMessage());
+        }
     }
 
     private void delete(Request request) {
-        request.getContext().success(request.getType());
+        try {
+            Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+            String id = request.getId();
+            String type = request.getType();
+            Query query;
+            if (id == null || id.equals("")){ 
+                query = QueryBuilder.select(SelectResult.all())
+                .from(DataSource.database(db))
+                .where(Expression.property("type").equalTo(Expression.string(type)));
+            } 
+            else {
+                query = QueryBuilder.select(SelectResult.all())
+                .from(DataSource.database(db))
+                .where(Expression.property("type").equalTo(Expression.string(type))
+                    .and(Expression.property("id").equalTo(Expression.string(id))));
+            }
+            delete(query.execute(), db);
+            request.getContext().success("true");
+        } 
+        catch (Exception x) {
+            request.getContext().error(x.getMessage());
+        }
     }
     
     private void table(Request request) {
