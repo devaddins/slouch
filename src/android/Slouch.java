@@ -119,8 +119,10 @@ public class Slouch extends CordovaPlugin {
     private void post(Request request) {
         try {
             Database db = DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+
             MutableDocument doc = new MutableDocument(request.getDataMap());
             doc.setString("type", request.getType());
+            doc.setString("id", doc.getId());
             db.save(doc);
             request.getContext().success("true");
         }

@@ -67,7 +67,7 @@ public class Request {
 
     private void setDatabase(String path) {
         String db = null;
-        Pattern p = Pattern.compile("^slouch://(\\w+)/");
+        Pattern p = Pattern.compile("^slouch://([\\w-]+)/");
         Matcher m = p.matcher(path);
         if (m.find() && m.groupCount() >= 1) {
             db = m.group(1);
@@ -77,7 +77,7 @@ public class Request {
 
     private void setType(String path) {
         String ty = null;
-        Pattern p = Pattern.compile("^slouch://(\\w+)/(\\w+)");
+        Pattern p = Pattern.compile("^slouch://([\\w-]+)/([\\w-]+)");
         Matcher m = p.matcher(path);
         if (m.find() && m.groupCount() >= 2) {
             ty = m.group(2);
@@ -87,7 +87,7 @@ public class Request {
 
     private void setId(String path) {
         String id = null;
-        Pattern p = Pattern.compile("^slouch://(\\w+)/(\\w+)/(\\w+)");
+        Pattern p = Pattern.compile("^slouch://([\\w-]+)/([\\w-]+)/([\\w-]+)");
         Matcher m = p.matcher(path);
         if (m.find() && m.groupCount() >= 3) {
             id = m.group(3);
