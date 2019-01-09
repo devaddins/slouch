@@ -37,4 +37,8 @@ public class DatabaseManager {
         }
         return Databases.get(name);
     }
+
+    public static void remove(String name) {
+        Databases.remove(name);
+    }
 }

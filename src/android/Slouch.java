@@ -7,6 +7,7 @@ import org.apache.cordova.CallbackContext;
 
 import com.couchbase.lite.Database;
 import com.couchbase.lite.DataSource;
+import com.couchbase.lite.Document;
 import com.couchbase.lite.Expression;
 import com.couchbase.lite.MutableDocument;
 import com.couchbase.lite.Query;
@@ -81,10 +82,16 @@ public class Slouch extends CordovaPlugin {
         return gson.toJson(rslt);
     }
 
+
     private void delete(ResultSet resultSet, Database database) throws CouchbaseLiteException {
-        ArrayList<Map<String, Object>> rslt = new ArrayList<Map<String, Object>>();
         for (Result r: resultSet.allResults()) {
-            // database.delete(r); // TODO! does not work
+            String id = r.getString("id");
+            if (id != null) {
+                Document doc = database.getDocument(id);
+                if (doc != null) {
+                    database.delete(doc);
+                }
+            }
         }
     }
 
@@ -133,23 +140,32 @@ public class Slouch extends CordovaPlugin {
 
     private void delete(Request request) {
         try {
-            Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+            String dbName = request.getDatabase();
+            Database db =  DatabaseManager.getDatabase(this.getAppContext(), dbName);
             String id = request.getId();
             String type = request.getType();
-            Query query;
-            if (id == null || id.equals("")){ 
-                query = QueryBuilder.select(SelectResult.all())
-                .from(DataSource.database(db))
-                .where(Expression.property("type").equalTo(Expression.string(type)));
-            } 
-            else {
-                query = QueryBuilder.select(SelectResult.all())
-                .from(DataSource.database(db))
-                .where(Expression.property("type").equalTo(Expression.string(type))
-                    .and(Expression.property("id").equalTo(Expression.string(id))));
+            if (id != null && type != null) {
+                if (id.equals("DELETE_TYPE_" + type)){ 
+                    Query query = QueryBuilder.select(SelectResult.all())
+                    .from(DataSource.database(db))
+                    .where(Expression.property("type").equalTo(Expression.string(type)));
+                    delete(query.execute(), db);
+                } 
+                else if (type.equals("DELETE_DATABASE") && id.equals("DELETE_DATABASE_" + dbName)) {
+                    db.delete();
+                    DatabaseManager.remove(dbName);
+                }
+                else {
+                    Query query = QueryBuilder.select(SelectResult.all())
+                    .from(DataSource.database(db))
+                    .where(Expression.property("type").equalTo(Expression.string(type))
+                        .and(Expression.property("id").equalTo(Expression.string(id))));
+                    delete(query.execute(), db);
+                }
+                request.getContext().success("true");
+            } else {
+                request.getContext().error("delete expects an id");
             }
-            delete(query.execute(), db);
-            request.getContext().success("true");
         } 
         catch (Exception x) {
             request.getContext().error(x.getMessage());
