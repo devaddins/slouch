@@ -52,10 +52,6 @@ public class Slouch extends CordovaPlugin {
             Request req = new Request(args.getString(0), context);
             this.get(req);
             return true;
-        } else if (action.equals("put")) {
-            Request req = new Request(args.getString(0), args.getString(1), context);
-            this.put(req);
-            return true;
         } else if (action.equals("post")) {
             Request req = new Request(args.getString(0), args.getString(1), context);
             this.post(req);
@@ -63,14 +59,6 @@ public class Slouch extends CordovaPlugin {
         } else if (action.equals("delete")) {
             Request req = new Request(args.getString(0), context);
             this.delete(req);
-            return true;
-        } else if (action.equals("table")) {
-            Request req = new Request(args.getString(0), args.getString(1), context);
-            this.table(req);
-            return true;
-        } else if (action.equals("database")) {
-            Request req = new Request(args.getString(0), context);
-            this.database(req);
             return true;
         }
         return false;
@@ -100,7 +88,7 @@ public class Slouch extends CordovaPlugin {
                 .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type))
                     .and(Expression.property(ID_NAME).equalTo(Expression.string(id))));
             }
-            else if (id != null) { 
+            else if (type != null) { 
                 query = QueryBuilder.select(SelectResult.all())
                 .from(DataSource.database(db))
                 .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type)));
@@ -116,24 +104,35 @@ public class Slouch extends CordovaPlugin {
         }
     }
 
-    private void put(Request request) {
-        request.getContext().success(request.getType());
-    }
-
     private void post(Request request) {
         try {
             String type = request.getType();
+            String id = request.getId();
+            Database db = DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
             if (type == null) {
                 request.getContext().error("post requires a type");
             } 
             else {
-                Database db = DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
-                Map<String, Object> dat = request.getDataMap();
-                MutableDocument doc = new MutableDocument(dat);
-                doc.setString(TYPE_NAME, request.getType());
-                doc.setString(ID_NAME, doc.getId());
-                db.save(doc);
-                request.getContext().success("true");
+                if (id == null ) {
+                    Map<String, Object> dat = request.getDataMap();
+                    MutableDocument doc = new MutableDocument(dat);
+                    doc.setString(TYPE_NAME, request.getType());
+                    doc.setString(ID_NAME, doc.getId());
+                    db.save(doc);
+                    request.getContext().success(gson.toJson(doc.getId()));
+                } else {
+                    Map<String, Object> dat = request.getDataMap();
+                    Document doc = db.getDocument(id);
+                    if (doc != null) {
+                        MutableDocument mdoc = new MutableDocument(id, dat);
+                        mdoc.setString(TYPE_NAME, request.getType());
+                        mdoc.setString(ID_NAME, id);
+                        db.save(mdoc);
+                        request.getContext().success(gson.toJson(id));
+                    } else {
+                        request.getContext().error("could not get document with id " + id);
+                    }
+                }
             }
         }
         catch (Exception x) {
@@ -145,11 +144,23 @@ public class Slouch extends CordovaPlugin {
         Type mapType = new TypeToken<Map<String, Object>>() {}.getType();
         return gson.fromJson(data, mapType);
     }
+
+    private Map<String, Object> getUnwrapped(Result result, String name) {
+        Map<String, Object> map = null;
+        Map<String, Object> resMap = result.toMap();
+        if (resMap != null) {
+            Object obj = resMap.get(name);
+            if (obj != null) {
+                String data = gson.toJson(obj);
+                map = getDataMap(data);
+            }
+        }
+        return map;
+    }
     
     private void delete(ResultSet resultSet, Database database) throws CouchbaseLiteException {
         for (Result r: resultSet.allResults()) {
-            String s = gson.toJson(r.toMap().get(database.getName()));
-            Map<String, Object> m = getDataMap(s);
+            Map<String, Object> m = getUnwrapped(r, database.getName());
             String id = m.get(ID_NAME).toString();
             if (id == null) {
                 throw new CouchbaseLiteException("no id field on result");
@@ -196,13 +207,5 @@ public class Slouch extends CordovaPlugin {
         catch (Exception x) {
             request.getContext().error(x.getMessage());
         }
-    }
-    
-    private void table(Request request) {
-        request.getContext().success(request.getType());
-    }
-    
-    private void database(Request request) {
-        request.getContext().success(request.getType());
     }
 }
