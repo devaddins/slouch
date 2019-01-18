@@ -37,8 +37,8 @@ import com.devaddins.slouch.DatabaseManager;
 
 
 /**
- * simple lazy couchbase
- * slouch://database_name/table_name/{id} 
+ * simple lazy couchbase lite
+ * slouch://database_name/type_name/{id} 
  */
 public class Slouch extends CordovaPlugin {
 
@@ -76,28 +76,46 @@ public class Slouch extends CordovaPlugin {
         return gson.toJson(rslt);
     }
 
+    private void fetch(Request request, String type, String id)
+    throws CouchbaseLiteException {
+        Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+        Query query = QueryBuilder.select(SelectResult.all())
+            .from(DataSource.database(db))
+            .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type))
+            .and(Expression.property(ID_NAME).equalTo(Expression.string(id))));
+        request.getContext().success(toJson(query.execute()));
+    }
+
+    private void fetch(Request request, String type) 
+    throws CouchbaseLiteException {
+        Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+        Query query = QueryBuilder.select(SelectResult.all())
+            .from(DataSource.database(db))
+            .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type)));
+        request.getContext().success(toJson(query.execute()));
+    }
+
+    private void fetch(Request request) 
+    throws CouchbaseLiteException {
+        Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
+        Query query = QueryBuilder.select(SelectResult.all())
+            .from(DataSource.database(db));
+        request.getContext().success(toJson(query.execute()));
+    }
+
     private void get(Request request) {
         try {
-            Database db =  DatabaseManager.getDatabase(this.getAppContext(), request.getDatabase());
             String id = request.getId();
             String type = request.getType();
-            Query query;
             if (id != null && type != null) {
-                query = QueryBuilder.select(SelectResult.all())
-                .from(DataSource.database(db))
-                .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type))
-                    .and(Expression.property(ID_NAME).equalTo(Expression.string(id))));
+                fetch(request, type, id);
             }
             else if (type != null) { 
-                query = QueryBuilder.select(SelectResult.all())
-                .from(DataSource.database(db))
-                .where(Expression.property(TYPE_NAME).equalTo(Expression.string(type)));
+                fetch(request, type);
             }  
             else {
-                query = QueryBuilder.select(SelectResult.all())
-                .from(DataSource.database(db));
+                fetch(request);
             }
-            request.getContext().success(toJson(query.execute()));
         } 
         catch (Exception x) {
             request.getContext().error(x.getMessage());
@@ -116,19 +134,20 @@ public class Slouch extends CordovaPlugin {
                 if (id == null ) {
                     Map<String, Object> dat = request.getDataMap();
                     MutableDocument doc = new MutableDocument(dat);
-                    doc.setString(TYPE_NAME, request.getType());
-                    doc.setString(ID_NAME, doc.getId());
+                    String i = doc.getId();
+                    doc.setString(TYPE_NAME, type);
+                    doc.setString(ID_NAME, i);
                     db.save(doc);
-                    request.getContext().success(gson.toJson(doc.getId()));
+                    fetch(request, type, i);
                 } else {
                     Map<String, Object> dat = request.getDataMap();
                     Document doc = db.getDocument(id);
                     if (doc != null) {
                         MutableDocument mdoc = new MutableDocument(id, dat);
-                        mdoc.setString(TYPE_NAME, request.getType());
+                        mdoc.setString(TYPE_NAME, type);
                         mdoc.setString(ID_NAME, id);
                         db.save(mdoc);
-                        request.getContext().success(gson.toJson(id));
+                        fetch(request, type, id);
                     } else {
                         request.getContext().error("could not get document with id " + id);
                     }
