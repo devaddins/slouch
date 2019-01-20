@@ -16,5 +16,7 @@
         <source-file src="src/android/Slouch.java" target-dir="src/com/devaddins/slouch" />
         <source-file src="src/android/Request.java" target-dir="src/com/devaddins/slouch" />
         <source-file src="src/android/DatabaseManager.java" target-dir="src/com/devaddins/slouch" />
+        <framework src="com.couchbase.lite:couchbase-lite-android:2.1.0" />
+        <framework src="com.google.code.gson:gson:2.8.5" />
     </platform>
 </plugin>
