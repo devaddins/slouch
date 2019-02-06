@@ -12,10 +12,12 @@
  Simple Lazy couchbase lite plugin for cordova
 
 # requirements
+
 * Cordova
   * version 8.1+
 
 # supports
+
 * Android
 * iOS (planned)
 
