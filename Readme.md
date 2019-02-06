@@ -24,9 +24,9 @@
 # install
 Add the plugin from the root of your cordova project
 
-''' bash
+``` bash
 $ cordova plugin add https://github.com/devaddins/slouch.git
-'''
+```
 
 # howto
 Slouch does not require any setup.  
@@ -42,6 +42,7 @@ The slouch location string takes this format
 ```
 slouch://dbname/typename/id
 ```
+
 Where 
 
 * slouch://
@@ -104,6 +105,7 @@ The post method will either create a new entry or update an existing entry.
 
 
 ``` js
+    // TODO! create an example 
 ```
 
 # delete
@@ -115,3 +117,7 @@ The delete method will either delete the entire database, an entire type, or a s
   * slouch.delete("slouch://dbname/typename/DELETE_TYPE_typename")
 * Entry
   * slouch.delete("slouch://dbname/typename/guid")
+
+``` js
+    // TODO! create an example 
+```
