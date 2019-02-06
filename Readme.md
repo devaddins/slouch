@@ -21,6 +21,7 @@
 
 # install
 Add the plugin from the root of your cordova project
+
 ''' bash
 $ cordova plugin add https://github.com/devaddins/slouch.git
 '''
@@ -29,15 +30,18 @@ $ cordova plugin add https://github.com/devaddins/slouch.git
 Slouch does not require any setup.  
 Like most (all?) cordova plugins you need to wait for the deviceready event before you can make use of this plugin.
 There are three methods you can call all of which return a promise.
+
 * get(slouchLocation {string})
 * post(slouchLocation {string}, data {object})
 * delete(slouchLocation {string})
 
 The slouch location string takes this format
+
 ```
 slouch://dbname/typename/id
 ```
 Where 
+
 * slouch://
   * is just the exact string "slouch://"
 * dbname
@@ -52,15 +56,18 @@ for example
 ```
 slouch://timeentries/2021-02-03/
 ```
+
 could be used to represent all time entries for that date, and
 
 ```
 slouch://timeentries/2021-02-03/89557d53-8aad-4ff8-9fb7-583ea8d97cdb
 ```
+
 would represent a specific time entry on that day. 
 
 # get 
 The get method gets results in one of three ways.
+
 * Entire Database
   * slouch.get('slouch://dbname')
 * All entries of type
@@ -84,8 +91,10 @@ cordova.plugins.slouch.get('slouch://lifelog/logentry/' + id)
 })
 .catch(x => console.log(x));
 ```
+
 # post
 The post method will either create a new entry or update an existing entry.
+
 * Create
   * slouch.post('slouch://dbname/typename', {foo: "bar"})
 * Update
@@ -104,4 +113,3 @@ The delete method will either delete the entire database, an entire type, or a s
   * slouch.delete("slouch://dbname/typename/DELETE_TYPE_typename")
 * Entry
   * slouch.delete("slouch://dbname/typename/guid")
-
