@@ -48,10 +48,12 @@ Where
   * is a guid representing a specific entry
 
 for example
+
 ```
 slouch://timeentries/2021-02-03/
 ```
 could be used to represent all time entries for that date, and
+
 ```
 slouch://timeentries/2021-02-03/89557d53-8aad-4ff8-9fb7-583ea8d97cdb
 ```
@@ -65,6 +67,7 @@ The get method gets results in one of three ways.
   * slouch.get('slouch://dbname/typename')
 * Entry with a specific id
   * slouch.get('slouch://dbname/typename/3e32a90d-612f-4d3f-aeaf-c9e18a4246e8')
+
 ``` js
 cordova.plugins.slouch.get('slouch://lifelog/logentry/' + id)
 .then(e => {
@@ -87,5 +90,18 @@ The post method will either create a new entry or update an existing entry.
   * slouch.post('slouch://dbname/typename', {foo: "bar"})
 * Update
   * slouch.post('slouch://dbname/typename/f5410793-9938-45cd-be28-b6f9daa10f8e', {foo: "bar"})
+
+
 ``` js
 ```
+
+# delete
+The delete method will either delete the entire database, an entire type, or a specific entry.
+
+* Database 
+  * slouch.delete("slouch://dbname/DELETE_DATABASE/DELETE_DATABASE_dbname")
+* Type
+  * slouch.delete("slouch://dbname/typename/DELETE_TYPE_typename")
+* Entry
+  * slouch.delete("slouch://dbname/typename/guid")
+
