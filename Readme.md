@@ -19,7 +19,6 @@
 # supports
 
 * Android
-* iOS (planned)
 
 # install
 Add the plugin from the root of your cordova project
