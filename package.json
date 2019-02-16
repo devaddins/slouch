@@ -1,7 +1,7 @@
 {
   "name": "com.devaddins.slouch",
   "version": "0.0.0",
-  "description": "lazy couchbase plugin",
+  "description": "a simple lazy couchbase-lite plugin for apache cordova",
   "cordova": {
     "id": "com.devaddins.slouch",
     "platforms": [
